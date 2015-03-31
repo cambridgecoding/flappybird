@@ -9,8 +9,10 @@ var stateActions = { preload: preload, create: create, update: update };
 // - actions on the game state (or null for nothing)
 var game = new Phaser.Game(790, 400, Phaser.AUTO, 'game', stateActions);
 
-var score = 0;
-var label_score;
+var scoreP1 = 0;
+var scoreP2 = 0;
+var label_scoreP1;
+var label_scoreP2;
 var player;
 var pipes;
 
@@ -26,6 +28,9 @@ function preload() {
     game.load.image("mouseCursorImg", "assets/cursor.png");
     game.load.audio("spaceOgg", "assets/point.ogg");
     game.load.image("pipe", "assets/pipe.png");
+    game.load.audio("jump", "assets/jump.ogg");
+    game.load.audio("crash", "assets/fall-crash.ogg");
+    game.load.image("imgPlayer2", "assets/player-2.png");
 
 }
 
@@ -33,7 +38,7 @@ function preload() {
  * Initialises the game. This function is only called once.
  */
 function create() {
-    // set the background colour of the scene (with hexdecimal)
+    // set the background colour of the scene (with hexadecimal)
     game.stage.setBackgroundColor("#E7FF00");
     game.physics.startSystem(Phaser.Physics.ARCADE);
     player = game.add.sprite(395, 200, "imgPlayer");
@@ -41,12 +46,12 @@ function create() {
     game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, createPipe);
     player.body.gravity.y = 300;
 
-    game.input.onDown.add(clickHandler);
-    game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(spaceHandler);
-    label_score = game.add.text(700, 50, "0");
-    game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(moveRight);
+    game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(jump);
+    label_scoreP1 = game.add.text(700, 50, "0");
+    label_scoreP2 = game.add.text(90, 50, "0");
     pipes = game.add.group();
     createPipe();
+
 }
 
 /*
@@ -58,18 +63,12 @@ function update() {
 
 }
 
-function clickHandler(event) {
+function jump(event) {
 
-    prompt("Did you just click?");
-    alert("If you did, then you clicked at...   " + event.x + ":" + event.y);
-    alert("A mouse cursor icon will appear where it was!");
-    game.add.sprite(event.x, event.y, "mouseCursorImg");
-
-}
-
-function spaceHandler(event) {
-
-    player.body.velocity.y = -165;
+    if (player.body.velocity.y != 100) {
+        player.body.velocity.y = -165;
+    }
+    game.sound.play("jump");
 
 }
 
@@ -77,14 +76,10 @@ function changeScore() {
 
     score = score + 1;
     label_score.setText(score.toString());
+    game.sound.play("spaceOgg");
 
 }
 
-function moveRight() {
-
-    player.x = player.x + 10;
-
-}
 
 function addPipeBlock(x, y) {
     var block = pipes.create(x, y, "pipe");
@@ -117,12 +112,15 @@ function createPipe() {
         }
 
     }
+
     changeScore();
+
 }
 
 function game_over() {
 
-    player.velocity.y = 0;
+    player.velocity.y = 100;
     pipes.velocity.x = 0;
+    game.sound.play("crash");
 
 }
