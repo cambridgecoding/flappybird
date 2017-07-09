@@ -8,11 +8,8 @@ var stateActions = { preload: preload, create: create, update: update };
 // - element where the game will be drawn ('game')
 // - actions on the game state (or null for nothing)
 var game = new Phaser.Game(790, 400, Phaser.AUTO, 'game', stateActions);
-
-var scoreP1 = 0;
-var scoreP2 = 0;
-var label_scoreP1;
-var label_scoreP2;
+var score = 0;
+var label_score;
 var player;
 var pipes;
 
@@ -47,8 +44,7 @@ function create() {
     player.body.gravity.y = 300;
 
     game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(jump);
-    label_scoreP1 = game.add.text(700, 50, "0");
-    label_scoreP2 = game.add.text(90, 50, "0");
+    label_score = game.add.text(700, 50, "0");
     pipes = game.add.group();
     createPipe();
 

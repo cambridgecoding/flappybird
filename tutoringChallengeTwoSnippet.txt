@@ -42,15 +42,23 @@ function create() {
     game.stage.setBackgroundColor("#E7FF00");
     game.physics.startSystem(Phaser.Physics.ARCADE);
     player = game.add.sprite(395, 200, "imgPlayer");
+    player2 = game.add.sprite(395, 230, "imgPlayer2");
     game.physics.arcade.enable(player);
+    game.physics.arcade.enable(player2);
     game.time.events.loop(pipeInterval * Phaser.Timer.SECOND, createPipe);
     player.body.gravity.y = 300;
+    player2.body.gravity.y = 300;
 
-    game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(jump);
+    game.input.onDown.add(p2Jump);
+    game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(p1Jump);
     label_scoreP1 = game.add.text(700, 50, "0");
     label_scoreP2 = game.add.text(90, 50, "0");
     pipes = game.add.group();
     createPipe();
+
+        if (player.velocity.y === 100 && player2.velocity.y === 100) {
+                pipes.velocity.x = 0;
+        }
 
 }
 
@@ -59,32 +67,49 @@ function create() {
  */
 function update() {
 
-    game.physics.arcade.overlap(player, pipes, game_over);
+   game.physics.arcade.overlap(player, pipes, game_overP1);
+   game.physics.arcade.overlap(player2, pipes, game_overP2);
 
 }
 
-function jump(event) {
+function p1Jump(event) {
 
-    if (player.body.velocity.y != 100) {
-        player.body.velocity.y = -165;
+    if (player.velocity.y != 100) {
+        player.velocity.y = -165;
     }
     game.sound.play("jump");
 
 }
 
-function changeScore() {
+function p2Jump(event) {
 
-    score = score + 1;
-    label_score.setText(score.toString());
+    if (player2.velocity.y != 100) {
+        player2.velocity.y = -165;
+    }
+    game.sound.play("jump");
+
+}
+
+function changeScoreP1() {
+
+    scoreP1 = scoreP1 + 1;
+    label_scoreP1.setText(scoreP1.toString());
     game.sound.play("spaceOgg");
 
 }
 
+function changeScoreP2() {
+
+    scoreP2 = scoreP2 + 1;
+    label_scoreP2.setText(scoreP2.toString());
+    game.sound.play("spaceOgg");
+
+}
 
 function addPipeBlock(x, y) {
     var block = pipes.create(x, y, "pipe");
     game.physics.arcade.enable(block);
-    block.body.velocity.x = -200;
+    block.velocity.x = -200;
 
 
 }
@@ -113,14 +138,26 @@ function createPipe() {
 
     }
 
-    changeScore();
+    if (player.velocity.y != 100) {
+        changeScoreP1();
+    }
+
+    if (player2.velocity.y != 100) {
+        changeScoreP2();
+    }
 
 }
 
-function game_over() {
+function game_overP1() {
 
     player.velocity.y = 100;
-    pipes.velocity.x = 0;
+    game.sound.play("crash");
+
+}
+
+function game_overP2() {
+
+    player2.velocity.y = 100;
     game.sound.play("crash");
 
 }
