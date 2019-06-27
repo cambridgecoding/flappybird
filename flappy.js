@@ -28,5 +28,5 @@ function create() {
  * This function updates the scene. It is called for every new frame.
  */
 function update() {
-    
+
 }

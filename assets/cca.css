@@ -61,3 +61,7 @@ body {
     margin-right: auto;
     width: 800px;
 }
+
+#logo {
+  height: 80px;
+}
